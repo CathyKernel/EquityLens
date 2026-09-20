@@ -1,0 +1,191 @@
+{
+  "raw_rows": 59246,
+  "sql_rows_loaded": 56553,
+  "sql_aggregate_names": [
+    "monthly_returns",
+    "rolling_volatility",
+    "annual_summary",
+    "sector_aggregate",
+    "volatility_league"
+  ],
+  "quality": {
+    "rows_input": 56553,
+    "duplicates_removed": 0,
+    "unmapped_tickers": [],
+    "ohlc_violations": 8,
+    "invalid_closes": 0,
+    "gaps_forward_filled": 8,
+    "gaps_unfillable_dropped": 0,
+    "short_history_tickers": [],
+    "outlier_threshold_sigma": 5.0,
+    "outlier_days_flagged": 194,
+    "rows_output": 56553,
+    "tickers_kept": 21,
+    "first_date": "2016-01-04",
+    "last_date": "2026-09-18",
+    "trading_days": 2693,
+    "zero_volume_days_pct": 0.014
+  },
+  "eda": {
+    "pooled_mean_daily_pct": 0.0009,
+    "pooled_std_daily_pct": 0.0207,
+    "pooled_skew": 0.157,
+    "pooled_kurtosis_excess": 14.997,
+    "pooled_min_pct": -0.35,
+    "pooled_max_pct": 0.3,
+    "best_ticker_total": "NVDA",
+    "best_ticker_total_pct": 28116.0,
+    "avg_cross_correlation": 0.323
+  },
+  "figures_eda": {
+    "price_evolution": "/home/z/my-project/equity-quant-ml/outputs/figures/01_price_evolution.png",
+    "return_distribution": "/home/z/my-project/equity-quant-ml/outputs/figures/02_return_distribution.png",
+    "volatility_league": "/home/z/my-project/equity-quant-ml/outputs/figures/03_volatility_league.png",
+    "correlation_heatmap": "/home/z/my-project/equity-quant-ml/outputs/figures/04_correlation_heatmap.png",
+    "sector_risk_return": "/home/z/my-project/equity-quant-ml/outputs/figures/05_sector_risk_return.png",
+    "sector_boxplot": "/home/z/my-project/equity-quant-ml/outputs/figures/06_sector_boxplot.png"
+  },
+  "stats": {
+    "normality": {
+      "per_ticker": "   ticker  jb_stat  p_value   skew  excess_kurtosis  normal\n0    AAPL   5075.4      0.0  0.110            6.738   False\n1    AMZN   3763.0      0.0  0.325            5.768   False\n2     BAC  11838.1      0.0  0.192           10.287   False\n3     CAT   1938.5      0.0 -0.018            4.167   False\n4     CVX  63376.2      0.0 -0.311           23.808   False\n5   GOOGL   2180.9      0.0  0.037            4.419   False\n6      GS   9056.6      0.0  0.213            8.995   False\n7    INTC  15597.2      0.0  0.405           11.788   False\n8     JNJ   8753.8      0.0 -0.194            8.844   False\n9     JPM  20532.8      0.0  0.314           13.543   False\n10     KO   9276.9      0.0 -0.554            9.046   False\n11   META  39443.2      0.0 -0.198           18.785   False\n12   MSFT   8876.1      0.0  0.270            8.898   False\n13   NFLX  36659.2      0.0 -0.666           18.065   False\n14   NVDA   7069.4      0.0  0.512            7.889   False\n15    PFE   2378.7      0.0  0.302            4.576   False\n16     PG  12804.6      0.0  0.161           10.702   False\n17   TSLA   2116.1      0.0  0.266            4.321   False\n18    UNH  59454.6      0.0 -1.331           22.913   False\n19    WMT  20284.8      0.0  0.217           13.468   False\n20    XOM   4013.2      0.0 -0.005            5.995   False",
+      "pooled": {
+        "jb_stat": 529889.3,
+        "p_value": 0.0,
+        "skew": 0.157,
+        "excess_kurtosis": 14.997
+      },
+      "n_reject": 21,
+      "n_tickers": 21,
+      "interpretation": "Jarque-Bera rejects normality for 21 of 21 tickers (pooled excess kurtosis = 15.0): daily returns have fat tails, so Gaussian-based risk metrics understate tail risk and non-parametric/tree models are preferred."
+    },
+    "stationarity": {
+      "ticker": "KO",
+      "price_adf_stat": -0.23,
+      "price_p_value": 0.9344421320418401,
+      "returns_adf_stat": -15.91,
+      "returns_p_value": 8.10337591349731e-29,
+      "interpretation": "ADF on the price-like series of KO: p = 9.34e-01 (unit root NOT rejected -> non-stationary); on daily returns: p = 8.10e-29 (unit root rejected -> stationary). Modelling returns instead of prices is therefore statistically justified."
+    },
+    "autocorrelation": {
+      "lags": [
+        1,
+        5,
+        10,
+        20
+      ],
+      "returns_ljung_box": {
+        "1": 4428.2,
+        "5": 17904.8,
+        "10": 25087.4,
+        "20": 27801.0
+      },
+      "returns_p_values": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0,
+        "20": 0.0
+      },
+      "squared_returns_ljung_box": {
+        "1": 856.9,
+        "5": 5217.5,
+        "10": 9175.6,
+        "20": 14671.8
+      },
+      "squared_returns_p_values": {
+        "1": 2.348250611792944e-188,
+        "5": 0.0,
+        "10": 0.0,
+        "20": 0.0
+      },
+      "interpretation": "Ljung-Box on returns at lag 10: p = 0.00e+00; on squared returns: p = 0.00e+00. Returns show little linear memory (weak-form efficiency) while squared returns are strongly autocorrelated -> pronounced volatility clustering (ARCH effects). This motivates the rolling-volatility and Bollinger-band features in the model."
+    },
+    "sector_anova": {
+      "f_stat": 2.447,
+      "p_value": 0.01658305786436278,
+      "sector_stats": "                   sector  n_obs  ...  ann_return_pct  ann_vol_pct\n0  Communication Services   8076  ...            0.25         0.37\n1  Consumer Discretionary   5384  ...            0.35         0.47\n2        Consumer Staples   8076  ...            0.15         0.20\n3                  Energy   5384  ...            0.15         0.29\n4              Financials   8076  ...            0.20         0.29\n5             Health Care   8076  ...            0.13         0.24\n6             Industrials   2692  ...            0.30         0.31\n7              Technology  10768  ...            0.35         0.39\n\n[8 rows x 6 columns]",
+      "interpretation": "p = 1.66e-02 < 0.05 -> reject the null (equal mean daily returns across sectors is contradicted by the data)"
+    }
+  },
+  "figures_stats": {
+    "qq_plot": "/home/z/my-project/equity-quant-ml/outputs/figures/07_qq_plot.png"
+  },
+  "dataset": {
+    "rows": 11067,
+    "tickers": 21,
+    "n_features": 27,
+    "up_period_share": 0.5608
+  },
+  "modeling": {
+    "best_model": "random_forest",
+    "test_metrics": {
+      "logistic": {
+        "accuracy": 0.5476,
+        "precision": 0.548,
+        "recall": 0.9885,
+        "f1": 0.7051,
+        "roc_auc": 0.482,
+        "majority_class_share": 0.5472
+      },
+      "random_forest": {
+        "accuracy": 0.5472,
+        "precision": 0.5472,
+        "recall": 1.0,
+        "f1": 0.7073,
+        "roc_auc": 0.5299,
+        "majority_class_share": 0.5472
+      },
+      "xgboost": {
+        "accuracy": 0.5292,
+        "precision": 0.5489,
+        "recall": 0.7833,
+        "f1": 0.6455,
+        "roc_auc": 0.513,
+        "majority_class_share": 0.5472
+      }
+    },
+    "cv": [
+      {
+        "model": "xgboost",
+        "cv_roc_auc_mean": 0.4927,
+        "cv_roc_auc_std": 0.0133,
+        "cv_accuracy_mean": 0.5359
+      },
+      {
+        "model": "random_forest",
+        "cv_roc_auc_mean": 0.4906,
+        "cv_roc_auc_std": 0.018,
+        "cv_accuracy_mean": 0.5631
+      },
+      {
+        "model": "logistic",
+        "cv_roc_auc_mean": 0.4835,
+        "cv_roc_auc_std": 0.0124,
+        "cv_accuracy_mean": 0.5466
+      }
+    ]
+  },
+  "backtest": {
+    "strategy": {
+      "label": "ML strategy",
+      "total_return_pct": 80.58,
+      "cagr_pct": 32.8,
+      "ann_vol_pct": 13.97,
+      "sharpe": 1.962,
+      "max_drawdown_pct": -10.79,
+      "hit_rate_pct": 62.86,
+      "n_periods": 105,
+      "avg_exposure_pct": 79.1,
+      "avg_turnover_pct_per_period": 31.25
+    },
+    "benchmark": {
+      "label": "SPY buy & hold",
+      "total_return_pct": 44.75,
+      "cagr_pct": 19.42,
+      "ann_vol_pct": 13.01,
+      "sharpe": 1.278,
+      "max_drawdown_pct": -13.98,
+      "hit_rate_pct": 57.14,
+      "n_periods": 105
+    }
+  }
+}

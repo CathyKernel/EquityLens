@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Equity Quant ML - Analysis Report</title>
+<style>
+  :root {
+    --ink: #1a2332; --muted: #5b6b7f; --line: #dde4ec;
+    --accent: #1f6feb; --accent-soft: #eaf1fe;
+    --up: #0f7b3d; --down: #b3352c; --bg: #f7f9fc;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Helvetica Neue", "Segoe UI", Arial, sans-serif;
+    color: var(--ink); background: #fff; margin: 0;
+    line-height: 1.55; font-size: 15px;
+  }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 40px 28px 80px; }
+  header.hero { border-bottom: 3px solid var(--accent); padding-bottom: 18px; margin-bottom: 28px; }
+  .hero h1 { font-size: 27px; margin: 0 0 6px; letter-spacing: -0.5px; }
+  .hero p.sub { color: var(--muted); margin: 4px 0 0; }
+  h2 {
+    font-size: 20px; color: var(--ink); margin: 34px 0 12px;
+    padding-bottom: 6px; border-bottom: 2px solid var(--line);
+  }
+  h3 { font-size: 15px; color: var(--muted); margin: 20px 0 8px; text-transform: uppercase; letter-spacing: .06em; }
+  p { line-height: 1.62; color: var(--ink); margin: 8px 0; }
+  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin: 18px 0; }
+  .kpi {
+    border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px;
+    background: #fbfcfe;
+  }
+  .kpi .k { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+  .kpi .v { font-size: 24px; font-weight: 700; margin-top: 4px; }
+  .k1 .v { color: var(--accent); }
+  table { border-collapse: collapse; width: 100%; margin: 12px 0; font-size: 13.5px; }
+  th { background: var(--accent-soft); color: var(--ink); text-align: left; padding: 8px 10px; border-bottom: 2px solid var(--accent); }
+  td { padding: 7px 10px; border-bottom: 1px solid var(--line); }
+  tr:nth-child(even) td { background: #f7f9fc; }
+  .num { text-align: right; font-variant-numeric: tabular-nums; }
+  figure { margin: 18px 0; text-align: center; }
+  figure img { max-width: 100%; border: 1px solid var(--line); border-radius: 8px; }
+  figcaption { font-size: 12.5px; color: var(--muted); margin-top: 6px; }
+  .callout { border-left: 4px solid var(--accent); background: var(--accent-soft); border-radius: 0 8px 8px 0; padding: 12px 16px; margin: 14px 0; }
+  .pos { color: var(--up); font-weight: 600; } .neg { color: var(--down); font-weight: 600; }
+  code { background: #eef2f6; border-radius: 4px; padding: 1px 5px; font-size: 12.5px; }
+  footer { margin-top: 36px; padding-top: 14px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>Equity Quant ML &mdash; Analysis Report</h1>
+  <p class="muted">S&amp;P 500 market analysis &amp; machine-learning trading signals</p>
+  <p class="muted">Sample: {{ universe_size }} tickers across {{ n_sectors }} GICS sectors &middot; {{ first_date }} to {{ last_date }} &middot; {{ rows }} daily records &middot; generated {{ generated_at }}</p>
+</header>
+
+<section>
+  <h2>1. Executive Summary</h2>
+  <p>
+    This project builds an end-to-end quantitative research pipeline over
+    {{ rows }} daily records for {{ universe_size }} S&amp;P 500 constituents:
+    market data ingestion and caching, an SQLite analytical layer, rigorous
+    cleaning and validation, exploratory analysis, a formal statistical
+    hypothesis-testing suite, technical feature engineering, next-day
+    direction classification with time-series-aware validation, and an
+    out-of-sample backtest net of transaction costs.
+  </p>
+  <div class="kpi-grid">
+    <div class="kpi k1"><div class="k">Best model</div><div class="v">{{ best_model }}</div></div>
+    <div class="kpi k1"><div class="k">Test ROC-AUC</div><div class="v">{{ best_auc }}</div></div>
+    <div class="kpi k1"><div class="k">Test accuracy</div><div class="v">{{ best_acc }}</div></div>
+    <div class="kpi"><div class="k">Strategy Sharpe</div><div class="v {{ 'pos' if strategy.sharpe > benchmark.sharpe else 'neg' }}">{{ strategy.sharpe }}</div></div>
+    <div class="kpi"><div class="k">SPY Sharpe</div><div class="v">{{ benchmark.sharpe }}</div></div>
+    <div class="kpi"><div class="k">Strategy max DD</div><div class="v">{{ strategy.max_drawdown_pct }}%</div></div>
+  </div>
+  <div class="callout">
+    <b>Headline finding.</b> {{ headline }}
+  </div>
+</section>
+
+<section>
+  <h2>2. Data &amp; Pipeline Overview</h2>
+  <p>
+    Daily OHLCV bars are pulled from Yahoo Finance (split/dividend adjusted),
+    cached as Parquet, then loaded into a local SQLite warehouse where
+    analytical SQL (window functions, CTEs, joins) produces the aggregates
+    used throughout this report. Data quality checks applied during
+    cleaning are summarised below.
+  </p>
+  <table>
+    <tr><th>Data-quality metric</th><th class="num">Value</th></tr>
+    <tr><td>Input rows</td><td class="num">{{ quality.rows_input }}</td></tr>
+    <tr><td>Rows after cleaning (rectangular panel)</td><td class="num">{{ quality.rows_output }}</td></tr>
+    <tr><td>Duplicate rows removed</td><td class="num">{{ quality.duplicates_removed }}</td></tr>
+    <tr><td>Missing bars forward-filled</td><td class="num">{{ quality.gaps_forward_filled }}</td></tr>
+    <tr><td>OHLC integrity violations</td><td class="num">{{ quality.ohlc_violations }}</td></tr>
+    <tr><td>Outlier sessions flagged ({{ quality.outlier_threshold_sigma }}-sigma, kept)</td><td class="num">{{ quality.outlier_days_flagged }}</td></tr>
+    <tr><td>Trading days covered</td><td class="num">{{ quality.trading_days }}</td></tr>
+  </table>
+
+  <h3>SQL analytical layer &mdash; sector aggregate</h3>
+  <p>Produced by a CTE + window-function query over <code>daily_prices</code> joined with <code>ticker_sector</code>:</p>
+  {{ sector_table_html | safe }}
+</section>
+
+<section>
+  <h2>3. Exploratory Analysis</h2>
+  {% if fig.price_evolution %}<figure><img src="data:image/png;base64,{{ fig.price_evolution }}" alt="Price evolution"><figcaption>Normalised price evolution; the black line is the equal-weight universe index.</figcaption></figure>{% endif %}
+  {% if fig.return_distribution %}<figure><img src="data:image/png;base64,{{ fig.return_distribution }}" alt="Return distribution"><figcaption>Pooled daily returns vs the Gaussian with identical mean/variance (log-density scale).</figcaption></figure>{% endif %}
+  {% if fig.volatility_league %}<figure><img src="data:image/png;base64,{{ fig.volatility_league }}" alt="Volatility league"><figcaption>Full-sample annualised volatility by ticker.</figcaption></figure>{% endif %}
+  {% if fig.correlation_heatmap %}<figure><img src="data:image/png;base64,{{ fig.correlation_heatmap }}" alt="Correlation"><figcaption>Cross-ticker correlation of daily returns (average off-diagonal: {{ eda.avg_cross_correlation }}).</figcaption></figure>{% endif %}
+  {% if fig.sector_risk_return %}<figure><img src="data:image/png;base64,{{ fig.sector_risk_return }}" alt="Sector risk return"><figcaption>Equal-weight sector risk/return profile over the full sample.</figcaption></figure>{% endif %}
+  {% if fig.sector_boxplot %}<figure><img src="data:image/png;base64,{{ fig.sector_boxplot }}" alt="Sector boxplot"><figcaption>Daily-return dispersion by sector.</figcaption></figure>{% endif %}
+</section>
+
+<section>
+  <h2>4. Statistical Hypothesis Testing</h2>
+  <p>{{ stats.normality.interpretation }}</p>
+  <p>{{ stats.stationarity.interpretation }}</p>
+  <p>{{ stats.autocorrelation.interpretation }}</p>
+  {% if fig.qq_plot %}<figure><img src="data:image/png;base64,{{ fig.qq_plot }}" alt="QQ plot"><figcaption>QQ-plot of pooled daily returns: tails are systematically heavier than Gaussian.</figcaption></figure>{% endif %}
+  <h3>Per-ticker Jarque-Bera (top 6 by excess kurtosis)</h3>
+  {{ jb_table_html | safe }}
+  <h3>Sector ANOVA</h3>
+  <p>{{ stats.sector_anova.interpretation }}</p>
+  {{ sector_anova_html | safe }}
+</section>
+
+<section>
+  <h2>5. Machine Learning &mdash; Next-week Direction</h2>
+  <p>
+    {{ n_features }} causal technical features (trailing returns, trend
+    ratios, RSI, MACD, Bollinger statistics, realised volatility,
+    microstructure and cross-sectional ranks, plus sector dummies) feed
+    three classifiers. Labels are the direction of the next
+    {{ horizon }}-trading-day return, sampled every {{ horizon }} days so
+    labels never overlap. Model selection uses {{ cv_folds }}-fold
+    <i>time-series</i> cross-validation inside the training period; the
+    final evaluation is on a chronological hold-out (last 20% of dates).
+  </p>
+  {{ cv_table_html | safe }}
+  {{ test_metrics_html | safe }}
+  {% if fig.roc_curves %}<figure><img src="data:image/png;base64,{{ fig.roc_curves }}" alt="ROC"><figcaption>ROC curves on the hold-out test set.</figcaption></figure>{% endif %}
+  {% if fig.confusion_matrix %}<figure><img src="data:image/png;base64,{{ fig.confusion_matrix }}" alt="Confusion"><figcaption>Confusion matrix of the best model at threshold 0.5.</figcaption></figure>{% endif %}
+  {% if fig.feature_importance %}<figure><img src="data:image/png;base64,{{ fig.feature_importance }}" alt="Importance"><figcaption>Top features by importance - volatility and trend features dominate.</figcaption></figure>{% endif %}
+</section>
+
+<section>
+  <h2>6. Out-of-sample Backtest</h2>
+  <p>
+    The portfolio rebalances every {{ horizon }} trading days: long positions
+    are taken only when the predicted probability of an up-period reaches
+    {{ threshold }} (vs 0.50 unconditional), with {{ cost_bps }} bps charged
+    per unit of turnover. The benchmark is SPY buy-and-hold measured over
+    the identical rebalance windows.
+  </p>
+  {{ backtest_table_html | safe }}
+  {% if fig.backtest %}<figure><img src="data:image/png;base64,{{ fig.backtest }}" alt="Backtest"><figcaption>Out-of-sample equity curves, net of transaction costs.</figcaption></figure>{% endif %}
+</section>
+
+<section>
+  <h2>7. Conclusions &amp; Limitations</h2>
+  <ul>
+    <li>{{ conclusion_ml }}</li>
+    <li>{{ conclusion_stats }}</li>
+    <li>{{ conclusion_bt }}</li>
+    <li><b>Limitations.</b> Directional accuracy above the coin-flip level is
+        modest and consistent with weak-form market efficiency; the edge is
+        thin and sensitive to cost assumptions. The universe is limited to
+        21 large caps, labels are close-dated with no overnight-gap
+        separation, and no regime-switching or macro features are included.
+        This is a research artefact demonstrating methodology, <b>not
+        investment advice</b>.</li>
+  </ul>
+</section>
+
+<footer>
+  Data: Yahoo Finance via yfinance (split/dividend adjusted). Generated by the
+  Equity Quant ML pipeline (Python, pandas, scikit-learn, XGBoost, SQLite,
+  statsmodels). For research/educational use only.
+</footer>
+
+</div>
+</body>
+</html>

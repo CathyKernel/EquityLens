@@ -1,0 +1,270 @@
+{
+  "raw_rows": 180431,
+  "sql_rows_loaded": 177738,
+  "sql_aggregate_names": [
+    "monthly_returns",
+    "rolling_volatility",
+    "annual_summary",
+    "sector_aggregate",
+    "volatility_league"
+  ],
+  "quality": {
+    "rows_input": 177738,
+    "duplicates_removed": 0,
+    "unmapped_tickers": [],
+    "ohlc_violations": 25,
+    "invalid_closes": 0,
+    "gaps_forward_filled": 25,
+    "gaps_unfillable_dropped": 0,
+    "short_history_tickers": [],
+    "outlier_threshold_sigma": 5.0,
+    "outlier_days_flagged": 660,
+    "rows_output": 177738,
+    "tickers_kept": 66,
+    "first_date": "2016-01-04",
+    "last_date": "2026-09-18",
+    "trading_days": 2693,
+    "zero_volume_days_pct": 0.014
+  },
+  "eda": {
+    "pooled_mean_daily_pct": 0.0007,
+    "pooled_std_daily_pct": 0.0195,
+    "pooled_skew": 0.261,
+    "pooled_kurtosis_excess": 18.158,
+    "pooled_min_pct": -0.35,
+    "pooled_max_pct": 0.52,
+    "best_ticker_total": "NVDA",
+    "best_ticker_total_pct": 28116.0,
+    "avg_cross_correlation": 0.339,
+    "vol_league_top": [
+      {
+        "ticker": "AMD",
+        "sector": "Technology",
+        "ann_vol_pct": 60.1
+      },
+      {
+        "ticker": "TSLA",
+        "sector": "Consumer Discretionary",
+        "ann_vol_pct": 58.5
+      },
+      {
+        "ticker": "NVDA",
+        "sector": "Technology",
+        "ann_vol_pct": 49.2
+      },
+      {
+        "ticker": "INTC",
+        "sector": "Technology",
+        "ann_vol_pct": 44.6
+      },
+      {
+        "ticker": "NFLX",
+        "sector": "Communication Services",
+        "ann_vol_pct": 41.7
+      },
+      {
+        "ticker": "BA",
+        "sector": "Industrials",
+        "ann_vol_pct": 41.0
+      },
+      {
+        "ticker": "SLB",
+        "sector": "Energy",
+        "ann_vol_pct": 40.1
+      },
+      {
+        "ticker": "AVGO",
+        "sector": "Technology",
+        "ann_vol_pct": 39.4
+      },
+      {
+        "ticker": "META",
+        "sector": "Communication Services",
+        "ann_vol_pct": 38.8
+      },
+      {
+        "ticker": "COP",
+        "sector": "Energy",
+        "ann_vol_pct": 38.2
+      }
+    ],
+    "vol_league_bottom": [
+      {
+        "ticker": "KO",
+        "sector": "Consumer Staples",
+        "ann_vol_pct": 18.2
+      },
+      {
+        "ticker": "JNJ",
+        "sector": "Health Care",
+        "ann_vol_pct": 18.5
+      },
+      {
+        "ticker": "PG",
+        "sector": "Consumer Staples",
+        "ann_vol_pct": 18.9
+      },
+      {
+        "ticker": "PEP",
+        "sector": "Consumer Staples",
+        "ann_vol_pct": 19.5
+      },
+      {
+        "ticker": "DUK",
+        "sector": "Utilities",
+        "ann_vol_pct": 20.2
+      }
+    ]
+  },
+  "figures_eda": {
+    "price_evolution": "/home/z/my-project/equitylens/outputs/figures/01_price_evolution.png",
+    "return_distribution": "/home/z/my-project/equitylens/outputs/figures/02_return_distribution.png",
+    "volatility_league": "/home/z/my-project/equitylens/outputs/figures/03_volatility_league.png",
+    "correlation_heatmap": "/home/z/my-project/equitylens/outputs/figures/04_correlation_heatmap.png",
+    "sector_risk_return": "/home/z/my-project/equitylens/outputs/figures/05_sector_risk_return.png",
+    "sector_boxplot": "/home/z/my-project/equitylens/outputs/figures/06_sector_boxplot.png"
+  },
+  "stats": {
+    "normality": {
+      "per_ticker": "   ticker  jb_stat  p_value   skew  excess_kurtosis  normal\n0    AAPL   5075.4      0.0  0.110            6.738   False\n1    ABBV  15453.2      0.0 -0.706           11.676   False\n2     ABT   6249.0      0.0 -0.162            7.473   False\n3     ACN   8717.8      0.0 -0.332            8.809   False\n4    ADBE   7513.7      0.0 -0.362            8.170   False\n..    ...      ...      ...    ...              ...     ...\n61    UNP   9465.2      0.0  0.096            9.203   False\n62     VZ   6591.8      0.0  0.305            7.658   False\n63    WFC   7321.5      0.0  0.035            8.096   False\n64    WMT  20284.8      0.0  0.217           13.468   False\n65    XOM   4013.2      0.0 -0.005            5.995   False\n\n[66 rows x 6 columns]",
+      "pooled": {
+        "jb_stat": 2442619.4,
+        "p_value": 0.0,
+        "skew": 0.261,
+        "excess_kurtosis": 18.158
+      },
+      "n_reject": 66,
+      "n_tickers": 66,
+      "interpretation": "Jarque-Bera rejects normality for 66 of 66 tickers (pooled excess kurtosis = 18.2): daily returns have fat tails, so Gaussian-based risk metrics understate tail risk and non-parametric/tree models are preferred."
+    },
+    "stationarity": {
+      "ticker": "KO",
+      "price_adf_stat": -0.23,
+      "price_p_value": 0.9344421320418401,
+      "returns_adf_stat": -15.91,
+      "returns_p_value": 8.10337591349731e-29,
+      "interpretation": "ADF on the price-like series of KO: p = 9.34e-01 (unit root NOT rejected -> non-stationary); on daily returns: p = 8.10e-29 (unit root rejected -> stationary). Modelling returns instead of prices is therefore statistically justified."
+    },
+    "autocorrelation": {
+      "lags": [
+        1,
+        5,
+        10,
+        20
+      ],
+      "returns_ljung_box": {
+        "1": 16374.0,
+        "5": 82350.6,
+        "10": 143280.9,
+        "20": 231267.6
+      },
+      "returns_p_values": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0,
+        "20": 0.0
+      },
+      "squared_returns_ljung_box": {
+        "1": 5312.3,
+        "5": 29270.4,
+        "10": 52921.8,
+        "20": 95347.0
+      },
+      "squared_returns_p_values": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0,
+        "20": 0.0
+      },
+      "interpretation": "Ljung-Box on returns at lag 10: p = 0.00e+00; on squared returns: p = 0.00e+00. Returns show little linear memory (weak-form efficiency) while squared returns are strongly autocorrelated -> pronounced volatility clustering (ARCH effects). This motivates the rolling-volatility and Bollinger-band features in the model."
+    },
+    "sector_anova": {
+      "f_stat": 2.287,
+      "p_value": 0.011249874004936971,
+      "sector_stats": "                    sector  n_obs  ...  ann_return_pct  ann_vol_pct\n0   Communication Services  16152  ...            0.18         0.32\n1   Consumer Discretionary  21536  ...            0.18         0.33\n2         Consumer Staples  13460  ...            0.15         0.20\n3                   Energy  10768  ...            0.15         0.34\n4               Financials  21536  ...            0.20         0.31\n5              Health Care  21536  ...            0.15         0.25\n6              Industrials  18844  ...            0.18         0.31\n7                Materials   8076  ...            0.18         0.25\n8              Real Estate   8076  ...            0.13         0.30\n9               Technology  29612  ...            0.30         0.39\n10               Utilities   8076  ...            0.13         0.22\n\n[11 rows x 6 columns]",
+      "interpretation": "p = 1.12e-02 < 0.05 -> reject the null (equal mean daily returns across sectors is contradicted by the data)"
+    }
+  },
+  "figures_stats": {
+    "qq_plot": "/home/z/my-project/equitylens/outputs/figures/07_qq_plot.png"
+  },
+  "dataset": {
+    "rows": 34782,
+    "tickers": 66,
+    "n_features": 30,
+    "up_period_share": 0.5512
+  },
+  "modeling": {
+    "best_model": "xgboost",
+    "test_metrics": {
+      "logistic": {
+        "accuracy": 0.5242,
+        "precision": 0.5292,
+        "recall": 0.9538,
+        "f1": 0.6807,
+        "roc_auc": 0.4893,
+        "majority_class_share": 0.5319
+      },
+      "random_forest": {
+        "accuracy": 0.5374,
+        "precision": 0.535,
+        "recall": 0.9952,
+        "f1": 0.6959,
+        "roc_auc": 0.5125,
+        "majority_class_share": 0.5319
+      },
+      "xgboost": {
+        "accuracy": 0.5262,
+        "precision": 0.5362,
+        "recall": 0.8076,
+        "f1": 0.6445,
+        "roc_auc": 0.5146,
+        "majority_class_share": 0.5319
+      }
+    },
+    "cv": [
+      {
+        "model": "xgboost",
+        "cv_roc_auc_mean": 0.4961,
+        "cv_roc_auc_std": 0.0183,
+        "cv_accuracy_mean": 0.5339
+      },
+      {
+        "model": "random_forest",
+        "cv_roc_auc_mean": 0.4923,
+        "cv_roc_auc_std": 0.026,
+        "cv_accuracy_mean": 0.5537
+      },
+      {
+        "model": "logistic",
+        "cv_roc_auc_mean": 0.4921,
+        "cv_roc_auc_std": 0.0211,
+        "cv_accuracy_mean": 0.543
+      }
+    ]
+  },
+  "backtest": {
+    "strategy": {
+      "label": "ML strategy",
+      "total_return_pct": 61.01,
+      "cagr_pct": 25.69,
+      "ann_vol_pct": 12.47,
+      "sharpe": 1.739,
+      "max_drawdown_pct": -10.53,
+      "hit_rate_pct": 59.05,
+      "n_periods": 105,
+      "avg_exposure_pct": 52.7,
+      "avg_turnover_pct_per_period": 46.52
+    },
+    "benchmark": {
+      "label": "SPY buy & hold",
+      "total_return_pct": 44.75,
+      "cagr_pct": 19.42,
+      "ann_vol_pct": 13.01,
+      "sharpe": 1.278,
+      "max_drawdown_pct": -13.98,
+      "hit_rate_pct": 57.14,
+      "n_periods": 105
+    }
+  }
+}

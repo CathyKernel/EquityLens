@@ -4,8 +4,7 @@
 
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/tests-9%20passed-brightgreen)](tests/)
-[![CI](https://img.shields.io/badge/CI-GitHub%20Actions-blueviolet)](.github/workflows/tests.yml)
+[![tests](https://github.com/CathyKernel/EquityLens/actions/workflows/tests.yml/badge.svg)](https://github.com/CathyKernel/EquityLens/actions/workflows/tests.yml)
 
 An end-to-end quantitative research pipeline over **10+ years of daily data for
 66 large-cap S&P 500 constituents across all 11 GICS sectors (177,738 cleaned
@@ -27,7 +26,7 @@ costs — wrapped up in a **print-ready 17-page PDF research report**.
 | Universe | 66 S&P 500 stocks, all 11 GICS sectors + SPY benchmark |
 | Data window | 2016-01-04 → 2026-09-18 (2,693 trading sessions) |
 | Clean sample | 177,738 daily observations; 660 outlier days flagged at 5σ (kept, not deleted) |
-| Modelling sample | 34,782 non-overlapping weekly observations, 30 causal features |
+| Modelling sample | 34,782 non-overlapping weekly observations, 30 feature columns (20 causal technical features + 10 sector one-hot) |
 | Best classifier (hold-out) | XGBoost — **ROC-AUC 0.515**, accuracy 52.6% vs 53.2% up-period base rate |
 | Out-of-sample strategy Sharpe | **1.74** vs 1.28 for SPY buy-and-hold (net of 2 bps costs) |
 | Out-of-sample CAGR / max drawdown | **25.7% / -10.5%** vs 19.4% / -14.0% for SPY, at 52.7% average exposure |
@@ -52,7 +51,7 @@ flowchart LR
     C --> D[Cleaning & validation\nquality report]
     D --> E[EDA\n6 figures]
     D --> F[Hypothesis tests\nJB / ADF / Ljung-Box / ANOVA]
-    D --> G[Feature engineering\n20 causal features\nnon-overlapping labels]
+    D --> G[Feature engineering\n20 technical + 10 sector features\nnon-overlapping labels]
     G --> H[Model comparison\nLogReg / RF / XGBoost\nTimeSeriesSplit CV]
     H --> I[Backtest\nweekly rebalance\n2 bps costs]
     E --> J[PDF report\noutputs/report.pdf]
@@ -65,8 +64,8 @@ flowchart LR
 
 ```bash
 # 1. Clone
-git clone https://github.com/<your-username>/equitylens.git
-cd equitylens
+git clone https://github.com/CathyKernel/EquityLens.git
+cd EquityLens
 
 # 2. Environment (Python 3.10+)
 python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
@@ -131,7 +130,7 @@ equitylens/
 │   ├── data_cleaning.py       # rectangularisation, validation, outliers
 │   ├── eda.py                 # 6 exploratory figures + summary stats
 │   ├── statistical_tests.py   # JB / ADF / Ljung-Box / ANOVA suite
-│   ├── feature_engineering.py # 20 causal features + forward-horizon label
+│   ├── feature_engineering.py # 20 technical features + sector one-hot + forward-horizon label
 │   ├── modeling.py            # 3 classifiers, TimeSeriesSplit CV, figures
 │   ├── backtest.py            # weekly-rebalance backtest vs SPY
 │   └── report_generator.py    # ReportLab → print-ready PDF report
